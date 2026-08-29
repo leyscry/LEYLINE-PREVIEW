@@ -79,7 +79,7 @@ jobs:
 
           cd site
           mkdir -p .github/workflows
-          cp -r ../.github/workflows .github/workflows
+          mv ../.github/workflows/* .github/workflows
           git init
           git config user.name "Leyline Preview Bot"
           git config user.email "leyline-preview-bot@users.noreply.github.com"
