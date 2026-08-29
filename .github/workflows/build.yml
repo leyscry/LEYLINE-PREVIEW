@@ -66,6 +66,8 @@ jobs:
 
         run: |
 
+          pwd
+          ls -la
           python generate_LEYLINE-PREVIEW.py
 
 
