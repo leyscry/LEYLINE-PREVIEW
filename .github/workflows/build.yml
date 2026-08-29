@@ -66,8 +66,6 @@ jobs:
 
         run: |
 
-          pwd
-          ls -la
           python generate_LEYLINE-PREVIEW.py
 
 
@@ -80,8 +78,8 @@ jobs:
         run: |
 
           cd site
-          mkdir -p .git/workflows
-          cp -r ../.git/workflows .git/workflows
+          mkdir -p .github/workflows
+          cp -r ../.github/workflows .github/workflows
           git init
           git config user.name "Leyline Preview Bot"
           git config user.email "leyline-preview-bot@users.noreply.github.com"
