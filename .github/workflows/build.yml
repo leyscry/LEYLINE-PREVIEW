@@ -1,0 +1,91 @@
+name: Build LEYLINE PREVIEW
+
+on:
+  workflow_dispatch:
+
+  schedule:
+    - cron: "0 * * * *"
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+      # ======================================================
+      # Checkout 当前 LEYLINE-PREVIEW 仓库
+      # ======================================================
+      - name: Checkout LEYLINE-PREVIEW
+        uses: actions/checkout@v4
+
+      # ======================================================
+      # Setup Python
+      # ======================================================
+
+      - name: Setup Python
+
+        uses: actions/setup-python@v5
+
+        with:
+          python-version: "3.12"
+
+
+      # ======================================================
+      # Clone 私有 LEYLINE-SCOUT-REPORT
+      # ======================================================
+
+      - name: Clone LEYLINE-SCOUT-REPORT
+
+        run: |
+          git clone  https://github.com/leyscry/LEYLINE-SCOUT-REPORT.git
+
+      # ======================================================
+      # Download 私有 Forbidden-Scroll 脚本
+      # ======================================================
+      - name: Download Generator
+        env:
+          LEYLINE_TOKEN: ${{ secrets.LEYLINE_TOKEN }}
+
+        run: |
+
+          curl --fail --silent --show-error -L \
+            -H "Authorization: Bearer ${LEYLINE_TOKEN}" \
+            -H "Accept: application/vnd.github.raw+json" \
+            "https://api.github.com/repos/leyscry/Forbidden-Scroll/contents/generate_LEYLINE-PREVIEW.py?ref=main" \
+            -o generate_LEYLINE-PREVIEW.py
+
+
+      # ======================================================
+      # Generate Site
+      # ======================================================
+
+      - name: Generate Site
+
+        run: |
+
+          python generate_LEYLINE-PREVIEW.py
+
+
+      # ======================================================
+      # Force Push site → gh-pages
+      # ======================================================
+
+      - name: Deploy Site
+
+        run: |
+
+          cd site
+          mkdir -p .github/workflows
+          mv ../.github/workflows/* .github/workflows
+          git init
+          git config user.name "Leyline Preview Bot"
+          git config user.email "leyline-preview-bot@users.noreply.github.com"
+          git add -A
+          git commit -m "🔮 Update Leyline Preview"
+          git branch -M gh-pages
+          git remote add origin \
+            https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
+          git push --force origin gh-pages
